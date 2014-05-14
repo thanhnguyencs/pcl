@@ -126,10 +126,32 @@ pcl_isnan (T &val)
 
 #else
 // Use the math.h macros
+#if __cplusplus > 199711L || defined(__clang__)
+# include <cmath>
+template<typename T>
+bool _isnan(T x) {
+  if (typeid(x) == typeid(float)) return std::isnan(float(x));
+  if (typeid(x) == typeid(double)) return std::isnan(double(x));
+  if (typeid(x) == typeid(long double)) return std::isnan((long double)x);
+  return false;
+}
+template<typename T>
+bool _isfinite(T x) {
+  if (typeid(x) == typeid(float)) return std::isfinite(float(x));
+  if (typeid(x) == typeid(double)) return std::isfinite(double(x));
+  if (typeid(x) == typeid(long double)) return std::isfinite((long double)x);
+  return true;
+}
+# define pcl_isnan(x)    _isnan(x)
+# define pcl_isfinite(x) _isfinite(x)
+# define pcl_isinf(x)    isinf(x)
+
+#else
 # include <math.h>
 # define pcl_isnan(x)    isnan(x)
 # define pcl_isfinite(x) isfinite(x)
 # define pcl_isinf(x)    isinf(x)
+#endif
 
 #endif
 
