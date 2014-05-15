@@ -43,6 +43,7 @@
 #include <pcl/point_types.h>
 #include <pcl/impl/instantiate.hpp>
 // Instantiations of specific point types
+template bool pcl::SHOTEstimationBase<pcl::PointXYZRGB, pcl::Normal, pcl::SHOT1344, pcl::ReferenceFrame>::initCompute();
 #ifdef PCL_ONLY_CORE_POINT_TYPES
   PCL_INSTANTIATE_PRODUCT(SHOTEstimation, ((pcl::PointXYZ)(pcl::PointXYZI)(pcl::PointXYZRGB)(pcl::PointXYZRGBA))((pcl::Normal))((pcl::SHOT352))((pcl::ReferenceFrame)))
   PCL_INSTANTIATE_PRODUCT(SHOTColorEstimation, ((pcl::PointXYZRGB)(pcl::PointXYZRGBA))((pcl::Normal))((pcl::SHOT1344))((pcl::ReferenceFrame)))
