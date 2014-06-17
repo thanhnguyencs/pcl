@@ -1,6 +1,10 @@
 ### ---[ PCL global CMake
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 OLD) # do not use VERSION option in project() command
+endif()
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "possible configurations" FORCE)
 
 # In case the user does not setup CMAKE_BUILD_TYPE, assume it's RelWithDebInfo
@@ -27,6 +31,12 @@ if(WIN32 AND NOT MINGW)
   endif()
   if(NOT DEFINED CMAKE_RELEASE_POSTFIX)
     set(CMAKE_RELEASE_POSTFIX "_release")
+  endif()
+  if(NOT DEFINED CMAKE_RELWITHDEBINFO_POSTFIX)
+    set(CMAKE_RELWITHDEBINFO_POSTFIX "_release")
+  endif()
+  if(NOT DEFINED CMAKE_MINSIZEREL_POSTFIX)
+    set(CMAKE_MINSIZEREL_POSTFIX "_release")
   endif()
 endif()
 
@@ -265,6 +275,16 @@ if(WITH_OPENNI)
   endif(OPENNI_FOUND)
 endif(WITH_OPENNI)
 
+# OpenNI 2
+option(WITH_OPENNI2 "OpenNI 2 driver support" TRUE)
+if(WITH_OPENNI2)
+  find_package(OpenNI2)
+  if (OPENNI2_FOUND)
+    set(HAVE_OPENNI2 ON)
+    include_directories(SYSTEM ${OPENNI2_INCLUDE_DIRS})
+  endif(OPENNI2_FOUND)
+endif(WITH_OPENNI2)
+
 # Fotonic (FZ_API)
 option(WITH_FZAPI "Build Fotonic Camera support" TRUE)
 if(WITH_FZAPI)
@@ -342,12 +362,18 @@ option(WITH_VTK "Build VTK-Visualizations" TRUE)
 if(WITH_VTK AND NOT ANDROID)
   find_package(VTK)
   if(VTK_FOUND)
+    message(STATUS "VTK_MAJOR_VERSION ${VTK_MAJOR_VERSION}")
     if (PCL_SHARED_LIBS OR
         (NOT (PCL_SHARED_LIBS) AND NOT (VTK_BUILD_SHARED_LIBS)))
       set(VTK_FOUND TRUE)
       find_package (QVTK)
-      message(STATUS "VTK found (include: ${VTK_INCLUDE_DIRS}, lib: ${VTK_LIBRARY_DIRS})")
-      link_directories(${VTK_LIBRARY_DIRS})
+      if (${VTK_MAJOR_VERSION} VERSION_LESS "6.0")
+         message(STATUS "VTK found (include: ${VTK_INCLUDE_DIRS}, lib: ${VTK_LIBRARY_DIRS})")
+         link_directories(${VTK_LIBRARY_DIRS})
+      else(${VTK_MAJOR_VERSION} VERSION_LESS "6.0")
+         include (${VTK_USE_FILE})
+         message(STATUS "VTK found (include: ${VTK_INCLUDE_DIRS}, lib: ${VTK_LIBRARIES}")
+      endif (${VTK_MAJOR_VERSION} VERSION_LESS "6.0")
       set(HAVE_VTK ON)
     else ()
       set(VTK_FOUND OFF)
