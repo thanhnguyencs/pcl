@@ -5,7 +5,7 @@
  * Support for Intel Perceptual Computing SDK cameras.
  * New Dual quaternion transformation estimation algorithm.
  * Bugfixes.
-
+ 
 ## *= 1.7.0 (23.07.2013) =*
 
 ### `libpcl_common:`
